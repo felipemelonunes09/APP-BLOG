@@ -1,0 +1,55 @@
+<%- include ('../../partials/header.ejs') %>
+<body>
+	<%- include ('../../partials/navbar.ejs') %>
+	<div class="container">
+		<h3 class="mt-5 display-3"> Edit article </h3>
+
+		<div class="card mt-4 shadow-lg">
+			<div class="card-body">
+				<form method="POST" action="/article/admin/edit">
+					<label class="mb-1"> Title </label>
+					<input type="hidden" name="formId" value="<%= article.id %>">
+					<input type="text" name="formTitle" class="form-control" placeholder="type the title of your new article" required="true" value="<%= article.title %>">
+					<label class="mt-4 mb-1">Article</label>
+					<textarea class="form-control" name="formBody" placeholder="Write your article here" id="formBody" required="true">
+						<%- article.body %>
+					</textarea>
+
+					<label class="mb-1 mt-4"> Categoria </label>
+					<select class="form-control" name="formCategory">
+						<option value="0" > Select one category </option>
+						<% categories.forEach((category) => { %>
+							
+							<% if (category.id == article.categoryId) { %>
+								<option value="<%= category.id%>" selected> <%= category.title %> </option>
+							<% } else { %>
+								<option value="<%= category.id%>"> <%= category.title %> </option>
+							<% }%>
+
+						<%})%>
+					</select>
+
+					<button class="btn btn-sm btn-dark mt-4"> Edit </button>
+				</form>
+			</div>
+		</demodiv>
+	</div>
+
+</body>
+<%- include ('../../partials/footer.ejs')%>
+
+<div id="content" style="display: none;">
+		<%- article.body %>
+	</div>
+
+<script type="text/javascript" src="/tinymce/tinymce.min.js"></script>
+<script type="text/javascript">
+	
+	tinymce.init({
+		selector: "textarea#formBody",
+		plugins: [
+		'advlist autolink link image lists print preview hr searchreplace wordcount fullscreen insertdatetime media save table paste emoticons'
+		]
+	})
+
+</script>

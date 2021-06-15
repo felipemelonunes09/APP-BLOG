@@ -1,0 +1,21 @@
+<%- include ('../../partials/header.ejs') %>
+<body>
+	<%- include ('../../partials/navbar.ejs') %>
+	<div class="container">
+		<h3 class="mt-5 display-3"> New user </h3>
+		<div class="card shadow-lg mt-4">
+			<div class="card-body m-2">
+				<form action="/user/admin/add" method="POST">
+					<label class="mb-1"> Email </label>
+					<input type="text" name="formEmail" class="form-control" placeholder="Write here your email" required="true">
+
+					<label class="mt-4 mt-2"> Password </label>
+					<input type="password" name="formPassword" placeholder="Write here your password" class="form-control" required="true">
+
+					<button class="btn btn-dark btn-sm mt-4"> Add </button>
+				</form>
+			</div>
+		</div>
+	</div>
+</body>
+<%- include ('../../partials/footer.ejs')%>

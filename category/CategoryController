@@ -1,0 +1,109 @@
+const express = require('express')
+const router = express.Router()
+
+const category = require('../models/Category')
+const slugify = require('slugify')
+
+router.get('/', (req, res) => {
+	console.log('[SERVER] view: admin/category/')
+	res.send('ROTA DE CATEGORIA')	
+})
+
+router.get('/admin', (req, res) => {
+	console.log('[SERVER] view: admin/category/')
+	category.findAll({raw: true}).then((categories) => {
+		res.render('admin/category/index', {categories: categories})
+	}).catch((erro) => {
+		console.log(erro)
+	})
+})
+
+router.get('/admin/add', (req, res) => {
+	console.log('[SERVER] view: admin/category/add')
+	res.render('admin/category/add')
+})
+
+
+router.get('/admin/edit/:id', (req, res) => {
+	console.log('[SERVER] view: admin/category/edit')
+	
+	if (isNaN(req.params.id)){
+		res.redirect('/category/admin')
+	}
+
+	category.findByPk(req.params.id).then((category) => {
+
+		if (category != undefined){
+			res.render('admin/category/edit', {category: category})
+		}
+		else{
+			res.redirect('/category/admin')
+		}
+
+	}).catch((erro) => {
+		console.log(erro)
+		res.redirect('/category/admin')
+	})
+	
+})
+
+//============================================================
+
+router.post('/admin/add', (req, res) => {
+
+	var title = req.body.formTitle
+
+	if (title != undefined){
+		console.log('[SERVER] process: admin/category/add status: init')
+		category.create({
+			title: req.body.formTitle,
+			slug: slugify(title)
+		}).then(() => {
+			console.log('[SERVER] process: admin/category/add status: done')
+			res.redirect('/category/admin')
+		}).catch((erro) => {
+			console.log('[SERVER] process: admin/categories/add status: error')
+			console.log(erro)
+		})
+	}else{
+		res.redirect('/admin/category/add')
+	}
+})
+
+router.post('/admin/destroy', (req, res) => {
+	var id = req.body.formId
+	if (id != undefined){
+		if (!isNaN(id)){
+
+			console.log('[SERVER] process: admin/category/destroy status: init')
+			category.destroy({where: {id: id}}).then(() => {
+				console.log('[SERVER] process: admin/categories/destroy status: done')
+			}).catch((erro) => {
+				console.log('[SERVER] process: admin/category/destroy status: error')
+				console.log(erro)
+			})
+
+		}
+	}
+	res.redirect('/category/admin')
+})
+
+router.post('/admin/edit', (req, res) => {
+	
+	var id = req.body.formId
+
+	console.log('[SERVER] process: admin/category/edit status: init')
+	category.update({title: req.body.formTitle, slug: slugify(req.body.formTitle)}, { where: { id: id}}).then(() => {
+		console.log('[SERVER] process: admin/category/edit status: done')
+	}).catch((erro) => {
+		console.log('[SERVER] process: admin/category/edit status: erro')
+		console.log(erro)
+	})
+
+	res.redirect('/category/admin')
+})
+
+
+
+
+module.exports = router

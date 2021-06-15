@@ -1,0 +1,61 @@
+<%- include ('../../partials/header.ejs')%>
+<body>
+	<%- include ('../../partials/navbar.ejs') %>
+	<div class="container">
+		<div class="row">
+			<div class="col-12">
+				<h3 class="mt-5 display-3"> Articles </h3>
+				<a href="/article/admin/add"> <button class="btn btn-sm btn-dark"> New </button> </a>
+			</div>
+		</div>
+
+		<div class="card shadow-lg mt-4">
+			<div class="card-body">
+				<table class="table mt-4">
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>Title</th>
+							<th>Slug</th>
+							<th>Category</th>
+							<th>Options</th>
+						</tr>
+					</thead>
+					<tbody>
+						<% articles.forEach(article => {%>
+							<tr>
+								<th> <%= article.id %> </th>
+								<th> <%= article.title %> </th>
+								<th> <%= article.slug %> </th>
+								<th> <%= article.category.title %> </th>
+								<th> 
+									<form method="POST" action="/article/admin/destroy" style="display: inline;" onsubmit="isOk(event)">
+										<input type="hidden" name="formId" value="<%= article.id %>">
+										<button type="submit" class="btn btn-danger btn-sm"> deletar </button>
+									</form>
+									<a href="/article/admin/edit/<%= article.id %>"> <button class="btn btn-primary btn-sm"> editar </button> </a>
+								</th>
+							</tr>
+						<% }) %>
+
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</body>
+<%- include ('../../partials/footer.ejs')%>
+<script type="text/javascript">
+	function isOk(event) {
+		// função que evita o formulario ser enviado
+
+		var val = confirm("Do you want to continue?")
+		if (val){
+
+		}else{
+			event.preventDefault();
+			console.log('data send form aborted')
+		}
+
+	}
+</script>

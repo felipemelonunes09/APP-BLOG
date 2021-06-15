@@ -1,0 +1,157 @@
+const express = require('express')
+const router = express.Router()
+const category = require('../models/Category')
+const article = require('../models/Article')
+const slugify = require('slugify')
+const isUser = require('../middleware/isUser')
+
+router.get('/admin/add', (req, res) => {
+	console.log('[SERVER] view: article/add')
+
+	category.findAll().then((categories) => {
+		res.render('admin/article/add', {categories: categories})
+	}).catch((erro) => {
+		console.log(erro)
+		res.render('admin/article/add')
+	})
+
+})
+
+router.get('/admin',(req, res) => {
+	console.log('[SERVER] view: article')
+
+	article.findAll({
+
+		include: [{model: category}]
+
+	}).then((articles) => {
+		res.render('admin/article/index', {articles: articles})
+	}).catch((erro) => {
+		console.log(erro)
+	})
+})
+
+router.get('/admin/edit/:id', (req, res) => {
+
+	var id = req.params.id
+	console.log('[SERVER] process: admin/article/edit status: init')
+	article.findByPk(id).then((article) => {
+
+		if (article != undefined){
+
+			category.findAll().then((categories) => {
+				console.log('[SERVER] process: admin/article/edit status: done')
+				res.render('admin/article/edit', {article: article, categories: categories})
+			})
+
+		}else{
+			res.redirect('/article/admin')
+		}	
+				
+	}).catch((erro) => {
+		console.log('[SERVER] process: admin/article/edit status: erro')
+		console.log(erro)
+		res.redirect('/article/admin')
+	})
+})
+
+
+router.get('/page/:num', (req, res) => {
+	
+	var page = req.params.num
+	if (isNaN(page) || page == 1){
+		offset = 0
+	} else {
+		console.log('================================================================================')
+		offset = (parseInt(page)-1)*4
+	}
+
+		article.findAndCountAll({
+			order: [
+			['id', 'DESC']
+			],
+			limit: 4, 
+			offset: offset
+
+		}).then((articles) => {
+			
+			var next
+			if (offset + 4 >= articles.count){
+				next = false
+			} else {
+				next = true
+			}
+
+			var result = {
+				page: parseInt(page),
+				articles: articles,
+				next: next
+			}
+			console.log(articles)
+			res.render('admin/article/page', { result: result})
+		})
+})
+
+// ======================================================
+
+router.post('/admin/add', (req, res) => {
+	var title = req.body.formTitle
+	var body = req.body.formBody
+	var category = req.body.formCategory
+
+	console.log(category)
+
+	console.log('[SERVER] process: admin/article/add status: init')
+	article.create({
+		title: title,
+		slug: slugify(title),
+		body: body,
+		categoryId: category
+	}).then(() => {
+		console.log('[SERVER] process: admin/article/add status: done')
+	}).catch((erro) => {
+		console.log('[SERVER] process: admin/article/add status: erro')
+		console.log(erro)
+	})
+	res.redirect('/article/admin')
+})
+ 
+router.post('/admin/destroy', (req, res) => {
+	
+	var id = req.body.formId
+	if  (id != undefined){
+		if (!isNaN(id)){
+			console.log('[SERVER] process: admin/article/destroy status: init')
+			article.destroy({ where: { id: id} }).then(() => {
+				console.log('[SERVER] process: admin/article/destroy status: done')
+			}).catch((erro) => {
+				console.log('[SERVER] process: admin/article/destroy status: erro')
+				console.log(erro)
+			})
+		}
+	}
+	res.redirect('/article/admin')
+
+})
+
+router.post('/admin/edit', (req, res) => {
+	var id = req.body.formId
+
+	console.log('[SERVER] process: admin/article/edit status: init')
+	article.update({
+		title: req.body.formTitle,
+		body: req.body.formBody,
+		categoryId: req.body.formCategory,
+		slug: slugify(req.body.formTitle)
+	}, { where: {id: id}}).then(() => {
+		console.log('[SERVER] process: admin/article/edit status: done')
+	}).catch((erro) => {
+		console.log('[SERVER] process: admin/article/edit status: erro')
+		console.log(erro)
+	})
+
+	res.redirect('/article/admin')
+})
+
+
+module.exports = router

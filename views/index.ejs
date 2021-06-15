@@ -1,0 +1,37 @@
+<%- include ('partials/header.ejs') %>
+<body>
+	<%- include ('partials/homenavbar.ejs') %>
+	<div class="container">
+		<h3 class="display-3 mt-5 mb-4"> Recent </h3>
+		<div class="card shadow-lg mb-5 mt-4">
+			<div class="card-body">
+				<form method="GET">
+					<label class="mb-1"> Category </label>
+					<select name="formCategoria" class="form-control">
+						<% categories.forEach(category => { %>
+							<option value="<%=category.slug%>"> <%= category.title %> </option>
+						<% }) %>
+					</select>
+					<button type="submit" class="btn btn-dark btn-sm mt-3"> Search </button>
+				</form>
+			</div>
+		</div>
+		<% articles.forEach(article => { %>
+			<div class="card shadow-lg mb-4">
+				<a href="article/<%= article.slug %>" style="text-decoration: none;">
+					<div class="card-body">
+						<div class="col-5">
+							<h5 class="text-primary"> <%= article.title %> </h5>
+						</div>
+					</div>
+				</a>
+			</div>
+		<% }) %>
+		<div class="row">
+			<div class="col-12">
+				<a href="/article/page/2" style="float: right"> Next >>> </a>
+			</div>
+		</div>
+	</div>
+</body>
+<%- include ('partials/footer.ejs') %>
